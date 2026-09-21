@@ -2,6 +2,7 @@ import cv2 as cv
 
 from eva import Eva
 
+
 eva = Eva()
 camera = cv.VideoCapture(0)
 frame_count = 0
@@ -14,12 +15,11 @@ while True:
         print("Failed to grab frame")
         break
     
-    if frame_count % 5 == 0:
-        result = eva.compared_embedding(frame)
+    faces = eva.app.get(frame)
     
-    if result is not None:
 
-        face, name, score = result
+    for face in faces: 
+        face, name, score = eva.compare_faces(face)
         x1, y1, x2, y2 = face.bbox.astype(int)
         
         cv.rectangle(

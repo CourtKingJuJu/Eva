@@ -4,16 +4,14 @@ import numpy as np
 from insightface.app import FaceAnalysis
 
 FACES_PATH = Path('roommates')
-app = FaceAnalysis(name='buffalo_l')
-app.prepare(ctx_id=0)
-
 
 
 class Eva:
     
     
     def __init__(self) -> None:
-        
+        self.app = FaceAnalysis(name='buffalo_l')
+        self.app.prepare(ctx_id=0)
         self.known_faces = self.__initialize_faces()
     
     
@@ -25,39 +23,37 @@ class Eva:
             if path.is_dir():
                 kf[path.name] = []
                 for file in path.iterdir():
-                    kf[path.name].append(self.get_embedding(file))
+                    kf[path.name].append(self.__get_embedding(file))
         
         return kf
     
     
-    def get_embedding(self, img_path):
+    def __get_embedding(self, img_path):
         image = cv.imread(img_path)
         
-        faces = app.get(image)
+        faces = self.app.get(image)
         
         if len(faces) == 0: 
             raise ValueError("Found no faces in image")
         
-        return faces[0].embedding
+        elif len(faces) == 1:
+            return faces[0].embedding
+        
+        else:
+            raise ValueError(f"Multiple faces in known faces {img_path}")
 
 
     def cosine_sim(self, a, b) -> int:
         return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)) 
     
     
-    def compared_embedding(self, image):
-        
-        faces = app.get(image)
-
-        if len(faces) == 0:
-            return None
+    def compare_faces(self, face):
         
         best_match = None
         best_score = -1
-        new_embedding = faces[0].embedding # Only supports one detected face
+        new_embedding = face.embedding
                 
         for name, embeddings in self.known_faces.items(): 
-            
             for known_embedding in embeddings: 
                 
                 score = self.cosine_sim(
@@ -69,4 +65,4 @@ class Eva:
                     best_match = name
                     best_score = score
 
-        return faces[0], best_match, best_score
+        return face, best_match, best_score
