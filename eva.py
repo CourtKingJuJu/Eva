@@ -13,6 +13,7 @@ class Eva:
         self.app = FaceAnalysis(name='buffalo_l')
         self.app.prepare(ctx_id=0)
         self.known_faces = self.__initialize_faces()
+        self.threshold = 0.25
     
     
     def __initialize_faces(self):
@@ -65,4 +66,8 @@ class Eva:
                     best_match = name
                     best_score = score
 
+        if best_score < self.threshold:
+            best_match = "Unknown"
+            best_score = 0
+        
         return face, best_match, best_score

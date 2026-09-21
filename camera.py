@@ -15,11 +15,19 @@ while True:
         print("Failed to grab frame")
         break
     
-    faces = eva.app.get(frame)
     
+    # Run facial detection/recognition every 5  frames
+    if frame_count % 5 == 0:
+        faces = eva.app.get(frame)
+        
+        for face in faces:
+            face, name, score = eva.compare_faces(face)
 
-    for face in faces: 
-        face, name, score = eva.compare_faces(face)
+            face.name = name
+            face.score = score
+    
+    # Drawl most recent face
+    for face in faces:
         x1, y1, x2, y2 = face.bbox.astype(int)
         
         cv.rectangle(
@@ -31,7 +39,7 @@ while True:
         )
         cv.putText(
             frame,
-            f"{name}: {score:.2f}",
+            f"{face.name}: {face.score:.2f}",
             (x1, y1 - 10),
             cv.FONT_HERSHEY_SIMPLEX,
             0.7,
