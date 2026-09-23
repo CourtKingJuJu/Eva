@@ -1,2 +1,4 @@
 roommates
 .venv
+.vscode
+models
