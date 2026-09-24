@@ -34,7 +34,7 @@ class Eva:
                     last_detection = now
                     print('detection')
                     self.commands.wake()
-                    command_audio = self.microphone.record_command(duration=5)
+                    command_audio = self.microphone.record_command()
                     command_text = self.whisper.transcribe(command_audio)
                     print(command_text)
                     self.handle_commands(command_text)
