@@ -6,11 +6,17 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sound_path = PROJECT_ROOT / "sounds" / "Y2Mate.is - Still Fly - Southern University Marching Band 2017 _ BOOMBOX CLASSIC 2017 _ 4K.mp3"
-
+theme_music_path = PROJECT_ROOT / "sounds" / "Y2Mate.is - Still Fly - Southern University Marching Band 2017 _ BOOMBOX CLASSIC 2017 _ 4K.mp3"
+wake_path = PROJECT_ROOT / "sounds" / "eva-wake-chime.mp3"
 
 class Commands:
     
+    def wake(self):
+        audio, sample_rate = sf.read(wake_path)
+        
+        sd.play(audio, samplerate=sample_rate)
+        sd.wait()
+        
     def parse(self, text: str):
         return text.lower().strip()
     
@@ -21,13 +27,12 @@ class Commands:
             self._play_theme_music()
             return None
 
-        if "what time is it" in command:
+        elif "what time is it" in command:
             return self._get_time()
-        
-        
+    
     def _play_theme_music(self):
 
-        audio, sample_rate = sf.read(sound_path)
+        audio, sample_rate = sf.read(theme_music_path)
         
         sd.play(audio, samplerate=sample_rate)
         sd.wait()

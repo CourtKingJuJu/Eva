@@ -22,7 +22,7 @@ class Eva:
         self.microphone.start()
         
         last_detection = 0
-        cooldown = 10
+        cooldown = 50
         
         while True:
             audio = self.microphone.get_audio()
@@ -33,6 +33,7 @@ class Eva:
                 if now - last_detection > cooldown:
                     last_detection = now
                     print('detection')
+                    self.commands.wake()
                     command_audio = self.microphone.record_command(duration=5)
                     command_text = self.whisper.transcribe(command_audio)
                     print(command_text)
