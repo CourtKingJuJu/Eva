@@ -48,7 +48,8 @@ class Eva:
         if command: 
             result = self.commands.execute(command)
             if result:
-                self.speaker()
+                print(result)
+                self.speaker.speak(result)
         
 
 

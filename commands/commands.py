@@ -1,7 +1,7 @@
 
 import sounddevice as sd
 import soundfile as sf
-import datetime
+from datetime import datetime
 from pathlib import Path
 
 
@@ -34,4 +34,4 @@ class Commands:
     
     
     def _get_time(self):
-        return "It is" + datetime.now().strftime("%I:%M %p")
+        return "It is " + datetime.now().strftime("%-I:%M %p")
