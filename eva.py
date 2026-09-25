@@ -5,6 +5,8 @@ from audio.wakeword import WakeWord
 from audio.whisper import Whisper
 from audio.speaker import Speaker
 
+from camera.camera import Camera
+
 from commands.commands import Commands
 
 
@@ -16,6 +18,7 @@ class Eva:
         self.whisper = Whisper()
         self.commands = Commands()
         self.speaker = Speaker()
+        self.camera = Camera()
     
     def run(self):
         
