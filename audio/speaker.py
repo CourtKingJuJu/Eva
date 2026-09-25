@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from elevenlabs.client import ElevenLabs
 from elevenlabs.play import play
+import sounddevice as sd
 
 
 VOICE_ID = "5NawXWWrHhVTefgmLEV8"
@@ -27,3 +28,6 @@ class Speaker:
         )
         
         play(audio)
+    
+    def stop(self):
+        sd.stop()

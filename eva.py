@@ -46,11 +46,19 @@ class Eva:
         
         command = self.commands.parse(text)
         
-        if command: 
-            result = self.commands.execute(command)
-            if result:
-                print(result)
-                self.speaker.speak(result)
+        if not command:
+            return 
+        
+        if command == "stop":
+            print("stopping")
+            self.speaker.stop()
+            self.commands.stop()
+            return
+ 
+        result = self.commands.execute(command)
+        if result:
+            print(result)
+            self.speaker.speak(result)
         
 
 

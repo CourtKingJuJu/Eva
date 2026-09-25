@@ -52,6 +52,10 @@ class Commands:
         
         elif "who are you" in command:
             return self._who_am_i()
+    
+    
+    def stop(self):
+        sd.stop()
         
     
     def _play_theme_music(self):
