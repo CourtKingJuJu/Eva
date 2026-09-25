@@ -22,7 +22,7 @@ class Eva:
         self.microphone.start()
         
         last_detection = 0
-        cooldown = 50
+        cooldown = 25
         
         while True:
             audio = self.microphone.get_audio()
