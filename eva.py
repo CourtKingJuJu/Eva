@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from audio.microphone import Microphone
 from audio.wakeword import WakeWord
@@ -6,6 +7,7 @@ from audio.whisper import Whisper
 from audio.speaker import Speaker
 
 from camera.camera import Camera
+from camera.face_recognition import FaceRecognition
 
 from commands.commands import Commands
 
@@ -19,6 +21,15 @@ class Eva:
         self.commands = Commands()
         self.speaker = Speaker()
         self.camera = Camera()
+        self.face_recognition = FaceRecognition()
+        
+        self.present = {
+            "julian": 0,
+            "tyler": 0,
+            "holden": 0,
+            "david": 0,
+        }
+        self.presence_timeout = 60 * 60
     
     def run(self):
         
@@ -28,6 +39,37 @@ class Eva:
         cooldown = 25
         
         while True:
+            
+            # Camera
+            ret, frame = self.camera.read()
+
+            if ret:
+                faces = self.face_recognition.get_faces(frame)
+                detected = set()
+                
+                for face in faces:
+                    identity, score = self.face_recognition.compare_faces(face)
+                    
+                    if identity in self.present:
+                        detected.add(identity)
+                        
+                        if self.present[identity] == 0:
+                            self.greet(identity)
+                        
+                        self.present[identity] = time.time()
+                
+                now = time.time()
+                
+                for identity in self.present:
+                    if (
+                        self.present[identity] != 0 and
+                        now - self.present[identity] > self.presence_timeout
+                    ):
+                        self.present[identity] = 0
+
+            
+            
+            # Audio
             audio = self.microphone.get_audio()
             
             if self.wake_word.detect(audio):
@@ -65,79 +107,37 @@ class Eva:
         
 
 
-
-
-# FACES_PATH = Path('roommates')
-
-# from pathlib import Path
-# import cv2 as cv
-# import numpy as np
-# from insightface.app import FaceAnalysis
-
-
-
-# class Eva:
-    
-    
-#     def __init__(self) -> None:
-#         self.app = FaceAnalysis(name='buffalo_l')
-#         self.app.prepare(ctx_id=0)
-#         self.known_faces = self.__initialize_faces()
-#         self.threshold = 0.25
-    
-    
-#     def __initialize_faces(self):
+    def greet(self, identity):
         
-#         kf = {}
+        time = int(datetime.now().strftime("%H%M"))
+        greeting_string = None
         
-#         for path in FACES_PATH.iterdir():
-#             if path.is_dir():
-#                 kf[path.name] = []
-#                 for file in path.iterdir():
-#                     kf[path.name].append(self.__get_embedding(file))
+        # morning messages
+        if 100 <= time <= 1200:
+            if 'julian' == identity:
+                greeting_string = "Good Morning Julian"
+            
+            elif 'tyler' == identity:
+                greeting_string = "Good Morning Tyler"
+            
+            elif 'david' == identity: 
+                greeting_string = "Good Morning David, have a great day today"
+            
+            elif 'holden' == identity: 
+                greeting_string = "Good morning Chud"
         
-#         return kf
-    
-    
-#     def __get_embedding(self, img_path):
-#         image = cv.imread(img_path)
+        else:        
+            if 'julian' == identity:
+                greeting_string = "Hello Julian"
+            
+            elif 'tyler' == identity:
+                greeting_string = "Hello Tyler"
+            
+            elif 'david' == identity: 
+                greeting_string = "Hello David"
+            
+            elif 'holden' == identity: 
+                greeting_string = "Hello Chud"
         
-#         faces = self.app.get(image)
-        
-#         if len(faces) == 0: 
-#             raise ValueError("Found no faces in image")
-        
-#         elif len(faces) == 1:
-#             return faces[0].embedding
-        
-#         else:
-#             raise ValueError(f"Multiple faces in known faces {img_path}")
-
-
-#     def cosine_sim(self, a, b) -> int:
-#         return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)) 
-    
-    
-#     def compare_faces(self, face):
-        
-#         best_match = None
-#         best_score = -1
-#         new_embedding = face.embedding
-                
-#         for name, embeddings in self.known_faces.items(): 
-#             for known_embedding in embeddings: 
-                
-#                 score = self.cosine_sim(
-#                     known_embedding,
-#                     new_embedding
-#                 )
-                
-#                 if score > best_score:
-#                     best_match = name
-#                     best_score = score
-
-#         if best_score < self.threshold:
-#             best_match = "Unknown"
-#             best_score = 0
-        
-#         return face, best_match, best_score
+        if greeting_string:
+            self.speaker.speak(greeting_string)
